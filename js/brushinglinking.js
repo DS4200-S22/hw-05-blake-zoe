@@ -79,7 +79,7 @@ d3.csv("data/iris.csv").then((data) => {
                       .text(xKey1)
       );
 
-    // Finx max y 
+    // Find max y 
     let maxY1 = d3.max(data, (d) => { return d[yKey1]; });
 
     // Create Y scale
@@ -115,7 +115,7 @@ d3.csv("data/iris.csv").then((data) => {
     // Define a brush
     brush1 = d3.brush();
 
-    //TODO: Add brush1 to svg1
+    // Add brush1 to svg1
     svg1.append("g")
         .attr("class", "brush")
         .call(brush1
@@ -123,7 +123,7 @@ d3.csv("data/iris.csv").then((data) => {
         );
   }
 
-  //TODO: Scatterplot 2 (show Sepal width on x-axis and Petal width on y-axis)
+  // Scatterplot 2 (show Sepal width on x-axis and Petal width on y-axis)
   {
     xKey2 = "Sepal_Width";
     yKey2 = "Petal_Width";
@@ -150,7 +150,7 @@ d3.csv("data/iris.csv").then((data) => {
                       .text(xKey2)
       );
 
-    // Finx max y 
+    // Find max y 
     let maxY2 = d3.max(data, (d) => { return d[yKey2]; });
 
     // Create Y scale
@@ -194,15 +194,12 @@ d3.csv("data/iris.csv").then((data) => {
   }
   
 
-  //TODO: Barchart with counts of different species
+  // Barchart with counts of different species
    {
     xKey3 = "Species";
     yKey3 = "Count";
 
-    // Bar chart code here 
-
     // Find max x
-    //let maxX3 = d3.max(data, (d) => { return d[xKey3]; });
 
     // Create X scale
     x3 = d3.scaleBand()
@@ -214,7 +211,7 @@ d3.csv("data/iris.csv").then((data) => {
     svg3.append("g")
         .attr("transform", `translate(0,${height - margin.bottom})`) 
         .call(d3.axisBottom(x3)
-          .tickFormat(i => bar_lengths[i].name))   
+          .tickFormat(i => bar_lengths[i].Species))   
         .attr("font-size", '20px')
         .call((g) => g.append("text")
                       .attr("x", width - margin.right)
@@ -224,7 +221,7 @@ d3.csv("data/iris.csv").then((data) => {
                       .text(xKey3)
       );
 
-    // Finx max y 
+    // Find max y 
     let maxY3 = d3.max(bar_lengths, (d) => { return d.score; });
 
     // Create Y scale
@@ -271,7 +268,7 @@ d3.csv("data/iris.csv").then((data) => {
   // Call when Scatterplot1 is brushed 
   function updateChart1(brushEvent) {
       
-      //TODO: Find coordinates of brushed region 
+      // Find coordinates of brushed region 
       const coordinates = brushEvent.selection;
   
       // Give bold outline to all points within the brush region in Scatterplot1
@@ -279,7 +276,7 @@ d3.csv("data/iris.csv").then((data) => {
         return isBrushed(coordinates, x1(d[xKey1]), y1(d[yKey1]))
       });
 
-      //TODO: Give bold outline to all points in Scatterplot2 corresponding to points within the brush region in Scatterplot1
+      // Give bold outline to all points in Scatterplot2 corresponding to points within the brush region in Scatterplot1
       myCircles2.classed("selected", (d) => {
         return isBrushed(coordinates, x1(d[xKey1]), y1(d[yKey1]))
       });
@@ -288,30 +285,28 @@ d3.csv("data/iris.csv").then((data) => {
   // Call when Scatterplot2 is brushed 
   function updateChart2(brushEvent) {
     
-    //TODO: Find coordinates of brushed region 
+    // Find coordinates of brushed region 
     const coordinates = brushEvent.selection;
 
-    //TODO: Start an empty set that you can store names of selected species in
-    species_set = [];
+    // Start an empty set that you can store names of selected species in
+    const species_set = new Set();
   
-    //TODO: Give bold outline to all points within the brush region in Scatterplot2 & collected names of brushed species
+    // Give bold outline to all points within the brush region in Scatterplot2 & collected names of brushed species
     myCircles2.classed("selected", (d) => {
-        return isBrushed(coordinates, x2(d[xKey2]), y2(d[yKey2]))
+        if (isBrushed(coordinates, x2(d[xKey2]), y2(d[yKey2]))) {
+          species_set.add(d.Species);
+          return true;
+        }
       });
 
-    //TODO: Give bold outline to all points in Scatterplot1 corresponding to points within the brush region in Scatterplot2
-    myCircles1.classed("selected", (d) => {
-        return isBrushed(coordinates, x2(d[xKey2]), y2(d[yKey2]))
-      });
+    // Give bold outline to all points in Scatterplot1 corresponding to points within the brush region in Scatterplot2
+    myCircles1.classed("selected", (d) => isBrushed(coordinates, x2(d[xKey2]), y2(d[yKey2])));
 
-    //TODO: Give bold outline to all bars in bar chart with corresponding to species selected by Scatterplot2 brush
-    bars.classed("selected", (d) => {
-        return isBrushed(coordinates, (d, i) => x3(i), (d) => y3(d.score))
-      });
-
+    // Give bold outline to all bars in bar chart with corresponding to species selected by Scatterplot2 brush
+    bars.classed("selected", (d) => species_set.has(d.Species));
   }
 
-    //Finds dots within the brushed region
+    // Finds dots within the brushed region
     function isBrushed(brush_coords, cx, cy) {
       if (brush_coords === null) return;
 
